@@ -7,8 +7,10 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.Handler
 import android.os.IBinder
+import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.task1.BoundService.MyBinder
 
 
@@ -32,11 +34,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        val runnable = Runnable {
-            //Toast.makeText(applicationContext,text, duration).show()
-        }
-        val handler = Handler()
-        handler.postDelayed(runnable, 3000)
     }
 
     override fun onStop() {
@@ -60,11 +57,15 @@ class MainActivity : AppCompatActivity() {
             boundService = null
         }
     }
+
+    fun startService(view: View) {
+        val serviceIntent = Intent(this, BoundService::class.java)
+        ContextCompat.startForegroundService(this, serviceIntent)
+
+    }
+
+    fun stopService(view: View) {
+        val serviceIntent = Intent(this, BoundService::class.java)
+        stopService(serviceIntent)
+    }
 }
-
-
-/*
-* override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }*/
