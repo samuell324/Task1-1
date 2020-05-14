@@ -58,14 +58,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun startService(view: View) {
-        val serviceIntent = Intent(this, BoundService::class.java)
-        ContextCompat.startForegroundService(this, serviceIntent)
 
-    }
 
     fun stopService(view: View) {
         val serviceIntent = Intent(this, BoundService::class.java)
         stopService(serviceIntent)
+
     }
 }
