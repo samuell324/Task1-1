@@ -6,10 +6,12 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
+import android.os.Message
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.task1.BoundService.MyBinder
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -21,6 +23,16 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+    }
+
+
+    fun handleMessage(msg: Boolean) {
+        when (msg) {
+            Boolean.CONNECTED -> imageView.setImageResource(R.drawable.ic_thumb_up_black_24dp)
+            Boolean.DISCONNECTED -> imageView.setImageResource(R.drawable.ic_thumb_down_black_24dp)
+            Boolean.IDLE -> imageView.setImageResource(R.drawable.ic_pan_tool_black_24dp)
+            Boolean.BUSY -> imageView.setImageResource(R.drawable.ic_watch_later_black_24dp)
+        }
     }
 
     override fun onStop() {
