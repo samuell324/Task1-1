@@ -1,12 +1,20 @@
 package com.example.task1
 
 enum class ConnectionState {
-    CONNECTED,
-    DISCONNECTED,
+    CONNECTED {
+        fun isConnected(){}
+    },
+    DISCONNECTED {
+        fun isDisconnected(){}
+    },
 }
 
 enum class ServiceState {
-    IDLE,
-    BUSY
+    IDLE {
+        fun isIdle(){}
+    },
+    BUSY {
+        fun isBusy(){}
+    };
 }
 
