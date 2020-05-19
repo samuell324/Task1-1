@@ -4,8 +4,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Bundle
-import android.os.IBinder
+import android.os.*
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -16,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     var boundService: BoundService? = null
     var isBound = false
     private val duration = Toast.LENGTH_SHORT
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,4 +62,8 @@ class MainActivity : AppCompatActivity() {
         startService(serviceIntent)
         doBindService()
     }
+
+    fun connectService(view: View) {
+    }
+
 }
