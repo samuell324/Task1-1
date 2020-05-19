@@ -1,21 +1,26 @@
 package com.example.task1
 
+import android.annotation.SuppressLint
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
+import android.content.Context
 import android.content.Intent
-import android.os.Binder
-import android.os.Handler
-import android.os.IBinder
-import android.os.Messenger
+import android.os.*
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import androidx.core.content.getSystemService
 import com.example.task1.App.Companion.channelID
+import kotlin.coroutines.coroutineContext
 
 
 class BoundService : Service() {
 
-    enum class ConnectionState {
-        CONNECTED,
-        DISCONNECTED,
+    var mMessenger: Messenger = Messenger(IncomingHandler())
+
+    enum class ConnectionState(i: Int) {
+        CONNECTED(1),
+        DISCONNECTED(1),
     }
 
     enum class ServiceState {
@@ -26,9 +31,22 @@ class BoundService : Service() {
     private val localBinder: IBinder = MyBinder()
     private var mConnectionState: ConnectionState = ConnectionState.DISCONNECTED
 
+    @SuppressLint("ShowToast")
     override fun onBind(intent: Intent): IBinder? {
-        return localBinder
+        Toast.makeText(applicationContext, "Service Binding...", Toast.LENGTH_LONG)
+        return mMessenger.binder
     }
+
+    class IncomingHandler: Handler() {
+        override fun handleMessage(msg: Message) {
+            when (msg.what) {
+                ConnectionState.CONNECTED.ordinal -> ConnectionState.CONNECTED
+                ConnectionState.DISCONNECTED.ordinal -> ConnectionState.DISCONNECTED
+            }
+            super.handleMessage(msg)
+        }
+    }
+
 
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -40,14 +58,16 @@ class BoundService : Service() {
             .setSmallIcon(
                 when (mConnectionState) {
                     ConnectionState.CONNECTED->R.drawable.ic_thumb_up_black_24dp
-                    ConnectionState.DISCONNECTED ->R.drawable.ic_thumb_down_black_24dp
+                    ConnectionState.DISCONNECTED->R.drawable.ic_thumb_down_black_24dp
                 }
             )
             .setContentText("Example")
             .setContentIntent(pendingIntent)
-            .build()
 
-        startForeground(1, notification)
+        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(startId,notification.build())
+
+        startForeground(startId, notification.build())
         return START_NOT_STICKY
     }
 
@@ -56,13 +76,13 @@ class BoundService : Service() {
             get() = this@BoundService
     }
 
-    private fun connect() {
+
+     fun connect() {
         mConnectionState = if (mConnectionState != ConnectionState.CONNECTED) {
             ConnectionState.CONNECTED
         } else {
             ConnectionState.DISCONNECTED
         }
-
     }
 
 }
