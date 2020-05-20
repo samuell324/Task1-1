@@ -16,12 +16,14 @@ class MainActivity : AppCompatActivity() {
     var isBound = false
     private val duration = Toast.LENGTH_SHORT
     var mMessenger: Messenger? = null
+    val bundle: Bundle = Bundle()
 
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
     }
 
     private val boundServiceConnection: ServiceConnection = object : ServiceConnection {
@@ -56,17 +58,17 @@ class MainActivity : AppCompatActivity() {
 
     fun stopService(view: View) {
         val serviceIntent = Intent(this, BoundService::class.java)
+        serviceIntent.action = BoundService.ACTION_STOP_FOREGROUND_SERVICE
         stopService(serviceIntent)
         doUnbindService()
     }
 
     fun startService(view: View) {
         val serviceIntent = Intent(this, BoundService::class.java)
+        serviceIntent.action = BoundService.ACTION_START_FOREGROUND_SERVICE
         startService(serviceIntent)
         doBindService()
     }
-
-
 
     fun connectService(view: View) {
         if (isBound) {

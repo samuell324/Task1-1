@@ -1,19 +1,29 @@
 package com.example.task1
+import android.R
+import android.app.Notification
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
-import android.os.*
+import android.os.Handler
+import android.os.IBinder
+import android.os.Message
+import android.os.Messenger
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
-import com.example.task1.App.Companion.channelID
 
 
 class BoundService : Service() {
 
     var mMessenger: Messenger = Messenger(IncomingHandler())
     var mConnectionState = ConnectionState.DISCONNECTED
+    private val startId = 1
+
+    companion object {
+        const val ACTION_START_FOREGROUND_SERVICE = "ACTION_START_FOREGROUND_SERVICE"
+        const val ACTION_STOP_FOREGROUND_SERVICE = "ACTION_STOP_FOREGROUND_SERVICE"
+    }
 
     enum class ConnectionState(i: Int) {
         CONNECTED(1),
@@ -37,37 +47,42 @@ class BoundService : Service() {
             }
             super.handleMessage(msg)
         }
-
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        val notificationIntent = Intent()
-        val pendingIntent: PendingIntent = PendingIntent.getActivity(this,0, notificationIntent, 0)
-        val notification = NotificationCompat.Builder(this, channelID)
-            notification.setContentTitle("Example Service")
-            notification.setContentText("Example")
-            notification.setContentIntent(pendingIntent)
-
-        val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        notification.setSmallIcon(
-            when(mConnectionState) {
-                ConnectionState.CONNECTED -> R.drawable.ic_thumb_up_black_24dp
-                ConnectionState.DISCONNECTED -> R.drawable.ic_thumb_down_black_24dp
-                ConnectionState.IDLE -> R.drawable.ic_watch_later_black_24dp
-                ConnectionState.BUSY -> R.drawable.ic_pan_tool_black_24dp
-            }
-        )
-        notificationManager.notify(startId,notification.build())
-        startForeground(startId, notification.build())
-        return START_NOT_STICKY
+        when(intent?.action) {
+            ACTION_START_FOREGROUND_SERVICE -> startForegroundService()
+            ACTION_STOP_FOREGROUND_SERVICE -> stopForegroundService()
+        }
+        return super.onStartCommand(intent, flags, startId)
     }
 
-    /*fun connect() {
-        mConnectionState = if (mConnectionState != ConnectionState.CONNECTED) {
-            ConnectionState.CONNECTED
-        } else {
-            ConnectionState.DISCONNECTED
-        }
-    }*/
+    private fun startForegroundService() {
+        startForeground(startId, getMyActivityNotification(smallIcon = 1))
+    }
+
+    private fun getMyActivityNotification(smallIcon: Int): Notification {
+        updateNotification()
+        val intent = Intent()
+        val pendingIntent: PendingIntent = PendingIntent.getActivity(this,0, intent, 0)
+        val b = NotificationCompat.Builder(this)
+        b.setOngoing(true)
+        b.setContentIntent(pendingIntent)
+        b.setContentTitle("Title")
+        b.setContentText("Simple text")
+        b.setSmallIcon(smallIcon)
+        return b.build()
+    }
+
+    private fun updateNotification() {
+        val smallIcon = R.drawable.ic_dialog_info
+        val notification: Notification = getMyActivityNotification(smallIcon)
+        val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        mNotificationManager.notify(startId, notification)
+    }
+
+    private fun stopForegroundService() {
+        stopForeground(true)
+        stopSelf()
+    }
 }
