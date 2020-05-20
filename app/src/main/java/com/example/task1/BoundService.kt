@@ -58,7 +58,7 @@ class BoundService : Service() {
     }
 
     private fun startForegroundService() {
-        startForeground(startId, getMyActivityNotification(smallIcon = 1))
+        startForeground(startId, getMyActivityNotification(smallIcon = R.drawable.btn_default_small))
     }
 
     private fun getMyActivityNotification(smallIcon: Int): Notification {
