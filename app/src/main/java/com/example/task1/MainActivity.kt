@@ -1,6 +1,5 @@
 package com.example.task1
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -10,7 +9,6 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.example.task1.BoundService.MyBinder
 
 
 class MainActivity : AppCompatActivity() {
@@ -26,11 +24,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
     }
 
-
     private val boundServiceConnection: ServiceConnection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
-            //val binderBridge = service as MyBinder
-            //boundService = binderBridge.service
             isBound = true
             mMessenger = Messenger(service)
 
@@ -75,7 +70,40 @@ class MainActivity : AppCompatActivity() {
 
     fun connectService(view: View) {
         if (isBound) {
+            val message: Message = Message.obtain(null, BoundService.ConnectionState.CONNECTED.ordinal)
+            mMessenger?.send(message)
+            Log.d("State", "$mMessenger")
+        }
+        else {
+            Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun disconnectService(view: View) {
+        if (isBound) {
             val message: Message = Message.obtain(null, BoundService.ConnectionState.DISCONNECTED.ordinal)
+            mMessenger?.send(message)
+            Log.d("State", "$mMessenger")
+        }
+        else {
+            Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun doWork(view: View) {
+        if (isBound) {
+            val message: Message = Message.obtain(null, BoundService.ConnectionState.BUSY.ordinal)
+            mMessenger?.send(message)
+            Log.d("State", "$mMessenger")
+        }
+        else {
+            Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun stopWork(view: View) {
+        if (isBound) {
+            val message: Message = Message.obtain(null, BoundService.ConnectionState.IDLE.ordinal)
             mMessenger?.send(message)
             Log.d("State", "$mMessenger")
         }
