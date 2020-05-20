@@ -7,18 +7,19 @@ import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import android.os.Messenger
-import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.task1.App.Companion.channelID
 import android.app.NotificationManager
 import android.content.Context
+import android.util.Log
 
 
 class BoundService : Service() {
 
     var mMessenger: Messenger = Messenger(IncomingHandler())
     var mConnectionState = ConnectionState.DISCONNECTED
+    var mServiceState = ServiceState.IDLE
     private val startId = 1
 
     companion object {
@@ -26,9 +27,11 @@ class BoundService : Service() {
         const val ACTION_STOP_FOREGROUND_SERVICE = "ACTION_STOP_FOREGROUND_SERVICE"
     }
 
-    enum class ConnectionState(i: Int) {
+    enum class ConnectionState(var key1: Int) {
         CONNECTED(1),
         DISCONNECTED(2),
+    }
+    enum class ServiceState(var key2: Int) {
         IDLE(3),
         BUSY(4)
     }
@@ -41,11 +44,14 @@ class BoundService : Service() {
     inner class IncomingHandler(): Handler() {
         override fun handleMessage(msg: Message) {
             when (msg.what) {
-                ConnectionState.DISCONNECTED.ordinal-> mConnectionState = ConnectionState.DISCONNECTED
-                ConnectionState.CONNECTED.ordinal -> mConnectionState = ConnectionState.CONNECTED
-                ConnectionState.IDLE.ordinal -> mConnectionState = ConnectionState.IDLE
-                ConnectionState.BUSY.ordinal -> mConnectionState = ConnectionState.BUSY
+                ConnectionState.DISCONNECTED.key1-> mConnectionState = ConnectionState.DISCONNECTED
+                ConnectionState.CONNECTED.key1 -> mConnectionState = ConnectionState.CONNECTED
             }
+            when (msg.what) {
+                ServiceState.IDLE.key2 -> mServiceState = ServiceState.IDLE
+                ServiceState.BUSY.key2 -> mServiceState = ServiceState.BUSY
+            }
+            Log.d("State", "$mServiceState")
             super.handleMessage(msg)
             updateNotification()
         }
@@ -79,14 +85,12 @@ class BoundService : Service() {
     private fun updateNotification() {
         val smallIcon: Int = when (mConnectionState) {
             ConnectionState.CONNECTED -> R.drawable.ic_thumb_up_black_24dp
-            ConnectionState.DISCONNECTED -> R.drawable.ic_thumb_down_black_24dp
-            ConnectionState.BUSY -> R.drawable.ic_watch_later_black_24dp
-            ConnectionState.IDLE -> R.drawable.ic_pan_tool_black_24dp
-        }
+            ConnectionState.DISCONNECTED -> R.drawable.ic_thumb_down_black_24dp}
         val notification: Notification = getMyActivityNotification(smallIcon)
         val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager.notify(startId, notification)
     }
+
 
     private fun stopForegroundService() {
         stopForeground(true)

@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
     var isBound = false
     private val duration = Toast.LENGTH_SHORT
     var mMessenger: Messenger? = null
+    var sMessenger: Messenger? = null
 
 
 
@@ -29,12 +30,14 @@ class MainActivity : AppCompatActivity() {
         override fun onServiceConnected(name: ComponentName, service: IBinder) {
             isBound = true
             mMessenger = Messenger(service)
+            sMessenger = Messenger(service)
 
         }
         override fun onServiceDisconnected(name: ComponentName) {
             isBound = false
             boundService = null
             mMessenger = null
+            sMessenger = null
         }
     }
 
@@ -71,9 +74,9 @@ class MainActivity : AppCompatActivity() {
 
     fun connectService(view: View) {
         if (isBound) {
-            val message: Message = Message.obtain(null, BoundService.ConnectionState.CONNECTED.ordinal)
+            val message: Message = Message.obtain(null, BoundService.ConnectionState.CONNECTED.key1)
             mMessenger?.send(message)
-            Log.d("State", "$mMessenger")
+            Log.d("StateActivity", "${BoundService.ConnectionState.CONNECTED.key1}")
         }
         else {
             Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
@@ -82,9 +85,9 @@ class MainActivity : AppCompatActivity() {
 
     fun disconnectService(view: View) {
         if (isBound) {
-            val message: Message = Message.obtain(null, BoundService.ConnectionState.DISCONNECTED.ordinal)
+            val message: Message = Message.obtain(null, BoundService.ConnectionState.DISCONNECTED.key1)
             mMessenger?.send(message)
-            Log.d("State", "$mMessenger")
+            Log.d("StateActivity", "${BoundService.ConnectionState.DISCONNECTED.key1}")
         }
         else {
             Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
@@ -93,9 +96,9 @@ class MainActivity : AppCompatActivity() {
 
     fun doWork(view: View) {
         if (isBound) {
-            val message: Message = Message.obtain(null, BoundService.ConnectionState.BUSY.ordinal)
-            mMessenger?.send(message)
-            Log.d("State", "$mMessenger")
+            val message: Message = Message.obtain(null, BoundService.ServiceState.BUSY.key2)
+            sMessenger?.send(message)
+            Log.d("StateActivity", "${BoundService.ServiceState.BUSY.key2}")
         }
         else {
             Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
@@ -104,9 +107,9 @@ class MainActivity : AppCompatActivity() {
 
     fun stopWork(view: View) {
         if (isBound) {
-            val message: Message = Message.obtain(null, BoundService.ConnectionState.IDLE.ordinal)
-            mMessenger?.send(message)
-            Log.d("State", "$mMessenger")
+            val message: Message = Message.obtain(null, BoundService.ServiceState.IDLE.key2)
+            sMessenger?.send(message)
+            Log.d("StateActivity", "${BoundService.ServiceState.IDLE.key2}")
         }
         else {
             Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
