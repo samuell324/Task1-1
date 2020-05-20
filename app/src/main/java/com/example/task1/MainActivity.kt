@@ -16,7 +16,6 @@ class MainActivity : AppCompatActivity() {
     var isBound = false
     private val duration = Toast.LENGTH_SHORT
     var mMessenger: Messenger? = null
-    val bundle: Bundle = Bundle()
 
 
 

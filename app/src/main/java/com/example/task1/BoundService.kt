@@ -1,17 +1,18 @@
 package com.example.task1
-import android.R
 import android.app.Notification
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.content.Context
 import android.content.Intent
 import android.os.Handler
 import android.os.IBinder
 import android.os.Message
 import android.os.Messenger
+import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
+import com.example.task1.App.Companion.channelID
+import android.app.NotificationManager
+import android.content.Context
 
 
 class BoundService : Service() {
@@ -27,9 +28,9 @@ class BoundService : Service() {
 
     enum class ConnectionState(i: Int) {
         CONNECTED(1),
-        DISCONNECTED(1),
-        IDLE(1),
-        BUSY(1)
+        DISCONNECTED(2),
+        IDLE(3),
+        BUSY(4)
     }
 
     override fun onBind(intent: Intent): IBinder? {
@@ -46,7 +47,9 @@ class BoundService : Service() {
                 ConnectionState.BUSY.ordinal -> mConnectionState = ConnectionState.BUSY
             }
             super.handleMessage(msg)
+            updateNotification()
         }
+
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -58,28 +61,27 @@ class BoundService : Service() {
     }
 
     private fun startForegroundService() {
-        startForeground(startId, getMyActivityNotification(smallIcon = R.drawable.btn_default_small))
+        startForeground(startId, getMyActivityNotification(smallIcon = R.drawable.ic_launcher_foreground))
     }
 
     private fun getMyActivityNotification(smallIcon: Int): Notification {
-        updateNotification()
         val intent = Intent()
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this,0, intent, 0)
-        val b = NotificationCompat.Builder(this)
-        b.setOngoing(true)
+        val b = NotificationCompat.Builder(this, channelID )
         b.setContentIntent(pendingIntent)
         b.setContentTitle("Title")
         b.setContentText("Simple text")
         b.setSmallIcon(smallIcon)
+        START_NOT_STICKY
         return b.build()
     }
 
     private fun updateNotification() {
-        var smallIcon: Int = when (mConnectionState) {
-            ConnectionState.CONNECTED -> R.drawable.arrow_up_float
-            ConnectionState.DISCONNECTED -> R.drawable.arrow_down_float
-            ConnectionState.BUSY -> R.drawable.alert_light_frame
-            ConnectionState.IDLE -> R.drawable.ic_dialog_info
+        val smallIcon: Int = when (mConnectionState) {
+            ConnectionState.CONNECTED -> R.drawable.ic_thumb_up_black_24dp
+            ConnectionState.DISCONNECTED -> R.drawable.ic_thumb_down_black_24dp
+            ConnectionState.BUSY -> R.drawable.ic_watch_later_black_24dp
+            ConnectionState.IDLE -> R.drawable.ic_pan_tool_black_24dp
         }
         val notification: Notification = getMyActivityNotification(smallIcon)
         val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
