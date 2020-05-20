@@ -75,7 +75,12 @@ class BoundService : Service() {
     }
 
     private fun updateNotification() {
-        val smallIcon = R.drawable.ic_dialog_info
+        var smallIcon: Int = when (mConnectionState) {
+            ConnectionState.CONNECTED -> R.drawable.arrow_up_float
+            ConnectionState.DISCONNECTED -> R.drawable.arrow_down_float
+            ConnectionState.BUSY -> R.drawable.alert_light_frame
+            ConnectionState.IDLE -> R.drawable.ic_dialog_info
+        }
         val notification: Notification = getMyActivityNotification(smallIcon)
         val mNotificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         mNotificationManager.notify(startId, notification)
