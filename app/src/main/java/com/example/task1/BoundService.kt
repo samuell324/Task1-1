@@ -3,16 +3,14 @@ import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Intent
-import android.os.Handler
-import android.os.IBinder
-import android.os.Message
-import android.os.Messenger
 import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import com.example.task1.App.Companion.channelID
 import android.app.NotificationManager
 import android.content.Context
+import android.os.*
 import android.util.Log
+import kotlinx.android.parcel.Parcelize
 
 
 class BoundService : Service() {
@@ -38,6 +36,7 @@ class BoundService : Service() {
 
     override fun onBind(intent: Intent): IBinder? {
         Toast.makeText(applicationContext, "Service Binding...", Toast.LENGTH_LONG).show()
+        sendGadget()
         return mMessenger.binder
     }
 
@@ -95,5 +94,13 @@ class BoundService : Service() {
     private fun stopForegroundService() {
         stopForeground(true)
         stopSelf()
+    }
+
+    @Parcelize
+    data class Gadget ( val value1: Int, val value2: Int, val value3: Int) :Parcelable
+
+    private fun sendGadget () {
+        val intent = Intent (this, MainActivity::class.java)
+        intent.putExtra("extra_Gadget", Gadget(value1 = 1, value2 = 2, value3 = 3))
     }
 }

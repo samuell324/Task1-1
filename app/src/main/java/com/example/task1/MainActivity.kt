@@ -1,5 +1,6 @@
 package com.example.task1
 
+import android.R.attr.name
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
