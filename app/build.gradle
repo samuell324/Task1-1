@@ -22,7 +22,24 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    //NDK BUILD
+    externalNativeBuild{
+        ndkBuild{
+            path "C:\\Users\\chist\\Desktop\\Task1\\jni\\Android.mk"
+        }
+    }
+    ndkVersion = '20.0.5594570'
 
+    defaultConfig {
+        externalNativeBuild {
+            ndkBuild {
+                targets "NDKtest"
+                arguments "NDK_APPLICATION_MK:=C:\\Users\\chist\\Desktop\\Task1\\jni\\Application.mk"
+                cFlags "-DTEST_C_FLAG1", "-DTEST_C_FLAG2"
+                cppFlags "-DTEST_CPP_FLAG2", "-DTEST_CPP_FLAG2"
+            }
+        }
+    }
 }
 
 dependencies {

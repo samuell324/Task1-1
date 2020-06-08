@@ -8,11 +8,21 @@ import android.content.ServiceConnection
 import android.os.*
 import android.util.Log
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 
 
 class MainActivity : AppCompatActivity() {
+
+    private external fun testString(): String
+
+    companion object {
+        init {
+            System.loadLibrary("NDKtest")
+        }
+    }
+
     var boundService: BoundService? = null
     var isBound = false
     private val duration = Toast.LENGTH_SHORT
@@ -24,7 +34,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
+        val jniTextView = findViewById<TextView>(R.id.jniTextView)
+        jniTextView.text = testString()
     }
 
     private val boundServiceConnection: ServiceConnection = object : ServiceConnection {
@@ -89,6 +100,8 @@ class MainActivity : AppCompatActivity() {
             val message: Message = Message.obtain(null, BoundService.ConnectionState.DISCONNECTED.key1)
             mMessenger?.send(message)
             Log.d("StateActivity", "${BoundService.ConnectionState.DISCONNECTED.key1}")
+            val itemGadgets = intent.getParcelableExtra<Parcelable>("extra_Gadget")
+            Log.d("sendGadget", "$itemGadgets")
         }
         else {
             Toast.makeText(applicationContext, "Bind service first", Toast.LENGTH_LONG).show()
